@@ -19,7 +19,8 @@ namespace AssetApi.Mappers
                 Purchase = stockModel.Purchase,
                 LastDiv = stockModel.LastDiv,
                 Industry = stockModel.Industry,
-                MarketCap = stockModel.MarketCap
+                MarketCap = stockModel.MarketCap,
+                Comments = stockModel.comments.Select(c => c.toCommentDto()).ToList()
             };
         }
         public static Stock toStockFromCreateDto(this CreateStockRequestDto stockModel)
