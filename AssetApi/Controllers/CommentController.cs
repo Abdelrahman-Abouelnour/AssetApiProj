@@ -20,22 +20,33 @@ namespace AssetApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() 
         {
+            if (!ModelState.IsValid) 
+            { 
+                return BadRequest(ModelState);
+            }
             var comments = await _Commentrepo.GetAllAsync();
             var commentsDto = comments.Select(s => s.toCommentDto());
             return Ok(commentsDto);
         }
-        [HttpGet]
-        [Route("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var com = await _Commentrepo.GetByIdAsync(id);
             if(com == null) return NotFound();
             return Ok(com.toCommentDto());
         }
-        [HttpPost("{stockId}")]
+        [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto )
         {
-            if(!await _stockRepo.StockExists(stockId))
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (!await _stockRepo.StockExists(stockId))
             {
                 return BadRequest("Stock does not exist");
             }
@@ -44,17 +55,25 @@ namespace AssetApi.Controllers
             return CreatedAtAction(nameof(GetById), new {id = commentModel.Id}, commentModel.toCommentDto());
         }
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute]int id, [FromBody] UpdateCommentDto comDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var comment = await _Commentrepo.UpdateAsync(id, comDto.toCommentFromUpdate());
             if (comment == null) return NotFound("Comment not found");
             return Ok(comment.toCommentDto());
         }
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var stockModel = await _Commentrepo.DeleteAsync(id);
             if (stockModel == null) return NotFound();
             return NoContent();
