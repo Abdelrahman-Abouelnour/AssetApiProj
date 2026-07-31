@@ -1,5 +1,6 @@
 ﻿using AssetApi.Data;
 using AssetApi.Dtos.Stock;
+using AssetApi.Helpers;
 using AssetApi.Interfaces;
 using AssetApi.Models;
 using Microsoft.EntityFrameworkCore;
@@ -30,9 +31,30 @@ namespace AssetApi.Repository
             return stockModel;
         }
 
-        public async Task<List<Stock>> GetallAsync()
+        public async Task<List<Stock>> GetallAsync(QueryObject query)
         {
-            return await _context.Stocks.Include(c =>c.comments).ToListAsync();
+             var stocks =  _context.Stocks.Include(c =>c.comments).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks =stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol",StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = query.isDesc ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
+                }
+            }
+
+
+
+            return await stocks.ToListAsync();
+
+
         }
 
         public async Task<Stock?> GetByIdAsync(int id)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AssetApi.Data;
 using AssetApi.Dtos.Stock;
+using AssetApi.Helpers;
 using AssetApi.Interfaces;
 using AssetApi.Mappers;
 using AssetApi.Models;
@@ -24,13 +25,13 @@ namespace   AssetApi.Controllers
             _stockRepository = stockRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject obj)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var stocks = await _stockRepository.GetallAsync();
+            var stocks = await _stockRepository.GetallAsync(obj);
             var stockDto = stocks.Select(s => s.toStockDto());
             return Ok(stockDto);
         }
@@ -86,5 +87,6 @@ namespace   AssetApi.Controllers
             if(stockModel == null) return NotFound();
             return NoContent();
         }
+
     }
 }
