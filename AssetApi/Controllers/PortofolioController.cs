@@ -1,6 +1,7 @@
 ﻿using AssetApi.Extensions;
 using AssetApi.Interfaces;
 using AssetApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace AssetApi.Controllers
             _stockRepo = repository;
             _portfolioRepo = portfolioRepository;
         }
-        //[Authorize]
+        [Authorize]
         [HttpGet()]
         public async Task<IActionResult> GetPortofolio()
         {
@@ -30,7 +31,7 @@ namespace AssetApi.Controllers
             return Ok(portofolio);
         }
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> AddPortfolio(string symbol)
         {
             var username = User.GetUsername();
@@ -56,7 +57,7 @@ namespace AssetApi.Controllers
             return Created();
         }
         [HttpDelete]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> RemovePortfolio(string symbol)
         {
             var username = User.GetUsername();
