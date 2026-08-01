@@ -1,7 +1,10 @@
 ﻿using AssetApi.Dtos.Comment;
+using AssetApi.Extensions;
 using AssetApi.Interfaces;
 using AssetApi.Mappers;
+using AssetApi.Models;
 using AssetApi.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AssetApi.Controllers
@@ -12,10 +15,12 @@ namespace AssetApi.Controllers
     {
         private readonly ICommentRepository _Commentrepo;
         private readonly IStockRepository _stockRepo;
-        public CommentController(ICommentRepository repository, IStockRepository stockRepo)
+        private readonly UserManager<AppUser> _userManager;
+        public CommentController(ICommentRepository repository, IStockRepository stockRepo, UserManager<AppUser> userManager)
         {
             _Commentrepo = repository;
             _stockRepo = stockRepo;
+            _userManager = userManager;
         }
         [HttpGet]
         public async Task<IActionResult> GetAll() 
@@ -50,7 +55,11 @@ namespace AssetApi.Controllers
             {
                 return BadRequest("Stock does not exist");
             }
+            var username = User.GetUsername();
+            var appUser = await _userManager.FindByNameAsync(username);
+
             var commentModel = commentDto.toCommentFromCreate(stockId);
+            commentModel.AppUserId = appUser.Id;
             await _Commentrepo.CreateAsync(commentModel);
             return CreatedAtAction(nameof(GetById), new {id = commentModel.Id}, commentModel.toCommentDto());
         }

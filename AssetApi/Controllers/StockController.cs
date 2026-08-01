@@ -32,7 +32,7 @@ namespace   AssetApi.Controllers
                 return BadRequest(ModelState);
             }
             var stocks = await _stockRepository.GetallAsync(obj);
-            var stockDto = stocks.Select(s => s.toStockDto());
+            var stockDto = stocks.Select(s => s.toStockDto()).ToList();
             return Ok(stockDto);
         }
         [HttpGet("{id:int}")]

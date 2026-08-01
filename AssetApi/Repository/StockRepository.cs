@@ -33,7 +33,7 @@ namespace AssetApi.Repository
 
         public async Task<List<Stock>> GetallAsync(QueryObject query)
         {
-             var stocks =  _context.Stocks.Include(c =>c.comments).AsQueryable();
+             var stocks =  _context.Stocks.Include(c =>c.comments).ThenInclude(a => a.AppUser).AsQueryable();
             if (!string.IsNullOrWhiteSpace(query.CompanyName))
             {
                 stocks =stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
@@ -49,6 +49,8 @@ namespace AssetApi.Repository
                     stocks = query.isDesc ? stocks.OrderByDescending(s => s.Symbol) : stocks.OrderBy(s => s.Symbol);
                 }
             }
+            var skip = (query.PageNumber - 1) * query.PageSize;
+            stocks = stocks.Skip(skip).Take(query.PageSize);
 
 
 
@@ -59,7 +61,12 @@ namespace AssetApi.Repository
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _context.Stocks.Include(c => c.comments).FirstOrDefaultAsync(i=> i.Id == id);
+            return await _context.Stocks.Include(c => c.comments).ThenInclude(a => a.AppUser).FirstOrDefaultAsync(i=> i.Id == id);
+        }
+
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _context.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
 
         public Task<bool> StockExists(int id)

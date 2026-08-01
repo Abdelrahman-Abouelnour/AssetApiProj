@@ -31,12 +31,12 @@ namespace AssetApi.Repository
 
         public async Task<List<Comment>> GetAllAsync()
         {
-            return await _context.Comments.ToListAsync();
+            return await _context.Comments.Include(c => c.AppUser).ToListAsync();
         }
 
         public async Task<Comment?> GetByIdAsync(int id)
         {
-            var com = await _context.Comments.FirstOrDefaultAsync(c => c.Id == id);
+            var com = await _context.Comments.Include(c => c.AppUser).FirstOrDefaultAsync(c => c.Id == id);
             if (com == null) return null;
             return com;
         }
