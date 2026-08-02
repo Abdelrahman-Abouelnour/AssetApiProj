@@ -77,14 +77,25 @@ namespace   AssetApi.Controllers
         }
         [HttpDelete]
         [Route("{id:int}")]
-        public async Task<IActionResult> Delete([FromRoute] int id) 
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var stockModel = await _stockRepository.DeleteAsync(id);
-            if(stockModel == null) return NotFound();
+            try
+            {
+                var stockModel = await _stockRepository.DeleteAsync(id);
+                if (stockModel == null) return NotFound();
+
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+                 
+            }
+            
+            
             return NoContent();
         }
 

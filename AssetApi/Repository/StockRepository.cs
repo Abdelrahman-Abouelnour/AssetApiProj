@@ -25,15 +25,20 @@ namespace AssetApi.Repository
         public async Task<Stock?> DeleteAsync(int id)
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+            List<Comment> Comments =  _context.Comments.Where(c => c.StockId == id).ToList();
+            foreach(var v in Comments)
+            {
+                _context.Comments.Remove(v);
+            }
             if (stockModel == null) return null;
             _context.Stocks.Remove(stockModel);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return stockModel;
         }
 
         public async Task<List<Stock>> GetallAsync(QueryObject query)
         {
-             var stocks =  _context.Stocks.Include(c =>c.comments).ThenInclude(a => a.AppUser).AsQueryable();
+             var stocks =  _context.Stocks.Include(c =>c.comments).ThenInclude(a => a.AppUser).AsEnumerable();
             if (!string.IsNullOrWhiteSpace(query.CompanyName))
             {
                 stocks =stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
@@ -54,7 +59,8 @@ namespace AssetApi.Repository
 
 
 
-            return await stocks.ToListAsync();
+            //return await stocks.ToListAsync();
+            return stocks.ToList(); ;
 
 
         }
