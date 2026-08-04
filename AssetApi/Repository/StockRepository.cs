@@ -25,16 +25,19 @@ namespace AssetApi.Repository
         public async Task<Stock?> DeleteAsync(int id)
         {
             var stockModel = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
-            List<Comment> Comments =  _context.Comments.Where(c => c.StockId == id).ToList();
-            foreach(var v in Comments)
-            {
-                _context.Comments.Remove(v);
-            }
             if (stockModel == null) return null;
+            List<Comment> Comments =  _context.Comments.Where(c => c.StockId == id).ToList();
+            foreach(var comment in Comments)
+            {
+                _context.Comments.Remove(comment);
+            }
             _context.Stocks.Remove(stockModel);
             _context.SaveChanges();
             return stockModel;
         }
+
+    
+
 
         public async Task<List<Stock>> GetallAsync(QueryObject query)
         {
@@ -60,7 +63,7 @@ namespace AssetApi.Repository
 
 
             //return await stocks.ToListAsync();
-            return stocks.ToList(); ;
+            return stocks.ToList(); 
 
 
         }

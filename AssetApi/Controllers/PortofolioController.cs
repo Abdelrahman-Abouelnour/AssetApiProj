@@ -26,6 +26,10 @@ namespace AssetApi.Controllers
         {
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null)
+            {
+                return NotFound();
+            }
             var portofolio = await _portfolioRepo.GetUserPortfolio(appUser);
 
             return Ok(portofolio);
@@ -36,6 +40,10 @@ namespace AssetApi.Controllers
         {
             var username = User.GetUsername();
             var appUser = await _userManager.FindByNameAsync(username);
+            if (appUser == null || appUser == default)
+            {
+                return NotFound();
+            }
             var stock = await _stockRepo.GetBySymbolAsync(symbol);
 
             if (stock == null) return BadRequest("Stock not found");
